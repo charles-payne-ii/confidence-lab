@@ -30,7 +30,7 @@ function Home({ data, start }: { data: import('./model').AppData; start: (module
   const practiced = new Set(data.practiceEntries.map((entry) => entry.localDate))
   const count = countDistinctPracticeDays(data.practiceEntries, days)
   return <div className="home-content">
-    <section className="home-lead" aria-labelledby="lead-title"><p className="eyebrow">I · Daily · 3 min</p><h1 id="lead-title">Build Confidence</h1><p>Record effort, success, progress, and the next action.</p><button className="button begin-button" onClick={() => start('confidence')}>Begin entry</button></section>
+    <section className="home-lead" aria-labelledby="lead-title"><p className="eyebrow">I · Daily · 3 min</p><h1 id="lead-title">Build Confidence</h1><p>Record your progress, one day at a time.</p><button className="button begin-button" onClick={() => start('confidence')}>Begin entry</button></section>
     <section className="week" aria-label={`${count} distinct practice days in the last seven local calendar days`}><h2 className="eyebrow">The week</h2><ul>{days.map((day) => {
       const [year, month, date] = day.split('-').map(Number)
       const letter = new Intl.DateTimeFormat(undefined, { weekday: 'narrow' }).format(new Date(year, month - 1, date))
