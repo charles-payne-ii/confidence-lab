@@ -27,6 +27,7 @@ body:has(.bank-light){background:#f4f3f6}body:has(.bank-dark){background:#1e1428
 .bank-secondary:hover{background:var(--sunk)}
 .bank-intro{text-align:center;align-items:center;padding-top:56px}
 .intro-zeus{width:56px;height:56px;color:var(--ink);flex:none;margin-bottom:27px}
+.bank-dark .intro-zeus{color:var(--accent)}
 .bank-intro .eyebrow{margin-bottom:20px}
 .bank-intro h1{font-size:40px;margin-bottom:20px}
 .bank-intro-copy{font-size:19px;line-height:1.55;color:var(--ink2);max-width:34ch;margin:0 auto 28px}
@@ -65,7 +66,7 @@ body:has(.bank-light){background:#f4f3f6}body:has(.bank-dark){background:#1e1428
 .remember-rule{width:56px;height:3px;border-top:3px double var(--line2);margin:0 auto 26px;flex:none}
 .remember blockquote{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:26px;line-height:1.5;color:var(--ink2);max-width:30ch;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
 .remember .bank-bottom{width:100%;padding-top:48px}
-.remember .bank-primary{background:#c9a862;color:#1e1428;border-color:#c9a862}.remember .bank-secondary{color:#c9a862}
+.bank-dark .bank-primary{background:#c9a862;color:#1e1428;border-color:#c9a862}.bank-dark .bank-secondary{color:#c9a862}
 .remember-next{min-height:54px;border:0;background:transparent;color:var(--muted);font-family:Cinzel,Georgia,serif;font-size:10px;letter-spacing:.15em;text-transform:uppercase}
 .remember-1 .remember-bars{margin-bottom:0}.pause-mark{position:relative;width:200px;height:200px;display:grid;place-items:center;margin:170px 0 48px;flex:none}
 .pause-ring{position:absolute;inset:0;border:1px solid #c9a862;border-radius:50%;animation:pause-ring 10s ease-in-out infinite}

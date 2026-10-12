@@ -12,6 +12,8 @@ A free personal mental performance app built with React, TypeScript, and Vite. R
 - A shared pillar that fills from the bottom, foundation/strong/complete milestones, light/dark themes, self-hosted italic fonts, and reduced-motion support.
 - Validated JSON export/import and optional private cloud accounts. Local storage works without a configured cloud service.
 
+New visits open in dark mode, including the Confidence Bank introduction. A saved light/dark preference is applied before the app renders and remembered in that browser.
+
 The app starts empty. Earlier version 1 bank examples remain under **Data & privacy → Earlier bank examples** and are still selectable before challenges. They are not converted into full memories automatically: the app never invents missing feelings or evidence.
 
 ## Start user testing

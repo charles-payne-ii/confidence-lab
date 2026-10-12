@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import type { User } from '@supabase/supabase-js'
+import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { CloudSync, type CloudState } from './cloud'
 import type { AppData } from './model'
-import { getSupabase, supabaseBackend } from './supabase'
+import { cloudConfigured, getSupabase, supabaseBackend } from './supabase'
 
 export function useCloud(data: AppData, apply: (data: AppData, explicit: boolean) => boolean) {
   const dataRef = useRef(data); dataRef.current = data
@@ -11,11 +11,22 @@ export function useCloud(data: AppData, apply: (data: AppData, explicit: boolean
   const [authReady, setAuthReady] = useState(false)
   const [authError, setAuthError] = useState('')
   const [state, setState] = useState<CloudState>({ mode: 'signed-out', message: 'Saved in this browser only.', pending: false })
-  const [supabase] = useState(getSupabase)
+  const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
+  const [clientLoaded, setClientLoaded] = useState(false)
   const syncRef = useRef<CloudSync | null>(null)
   const currentUser = useRef<User | null>(null)
   currentUser.current = user
   useEffect(() => {
+    let active = true
+    void getSupabase().then((client) => {
+      if (!active) return
+      setSupabase(client); setClientLoaded(true)
+      if (cloudConfigured && !client) setAuthError('Cloud sign-in could not start. Check browser storage settings or the service configuration, then reload. Keep a JSON backup of unsynced entries.')
+    })
+    return () => { active = false }
+  }, [])
+  useEffect(() => {
+    if (!clientLoaded) return
     if (!supabase) { setAuthReady(true); return }
     let active = true
     let storage: Storage | null = null
@@ -36,7 +47,7 @@ export function useCloud(data: AppData, apply: (data: AppData, explicit: boolean
     window.addEventListener('online', retry)
     window.addEventListener('focus', retry)
     return () => { active = false; sync.stop(); syncRef.current = null; subscription.subscription.unsubscribe(); window.removeEventListener('online', retry); window.removeEventListener('focus', retry) }
-  }, [supabase])
+  }, [supabase, clientLoaded])
   const stateRef = useRef(state); stateRef.current = state
   useEffect(() => {
     if (!authReady || !syncRef.current) return
@@ -45,9 +56,9 @@ export function useCloud(data: AppData, apply: (data: AppData, explicit: boolean
   }, [user?.id, authReady])
   useEffect(() => { syncRef.current?.changed() }, [data])
   return {
-    user, state, authReady, authError, configured: Boolean(supabase),
+    user, state, authReady, authError, configured: cloudConfigured,
     async signIn(email: string) {
-      if (!supabase) return { ok: false, message: 'Cloud storage has not been connected to this deployment yet.' }
+      if (!supabase) return { ok: false, message: cloudConfigured ? 'Cloud sign-in is unavailable in this browser. Check the message above and reload.' : 'Cloud storage has not been connected to this deployment yet.' }
       try {
         const redirect = new URL(import.meta.env.BASE_URL, window.location.origin).href
         const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: redirect } })

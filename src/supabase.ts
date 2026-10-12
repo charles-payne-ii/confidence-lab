@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { CloudConflict, validSnapshot, type CloudBackend, type CloudSnapshot } from './cloud'
 import { validateData } from './storage'
 
@@ -7,9 +7,12 @@ const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined
 export const cloudConfigured = Boolean(url && key)
 let client: SupabaseClient | null = null
 // A partial or malformed deployment configuration must not crash the local app.
-export function getSupabase(): SupabaseClient | null {
+export async function getSupabase(): Promise<SupabaseClient | null> {
   if (!cloudConfigured) return null
   try {
+    // The SDK can access browser storage during module evaluation. Keep import
+    // failures inside this boundary so local practice still opens with a warning.
+    const { createClient } = await import('@supabase/supabase-js')
     client ??= createClient(url!, key!, { auth: { flowType: 'pkce', detectSessionInUrl: true, persistSession: true, autoRefreshToken: true } })
     return client
   } catch { return null }
@@ -25,6 +28,7 @@ export function supabaseBackend(supabase: SupabaseClient): CloudBackend {
     if (error || data.session?.user.id !== userId) throw new Error('Your sign-in changed. Reconnect cloud storage before saving.')
     // Pin this request to its account, even if sign-out/account switching occurs mid-flight.
     const token = data.session.access_token
+    const { createClient } = await import('@supabase/supabase-js')
     return createClient(url!, key!, { accessToken: async () => token })
   }
   return {

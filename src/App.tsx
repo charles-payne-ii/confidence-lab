@@ -22,11 +22,7 @@ function routeFromHash(): View {
 }
 
 function initialTheme(): 'light' | 'dark' {
-  try {
-    const theme = localStorage.getItem('confidence-lab.theme')
-    if (theme === 'light' || theme === 'dark') return theme
-  } catch { /* Theme has an in-memory fallback. Entry storage reports its own errors. */ }
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
 }
 
 function Home({ data, start, openBank, addMemory, dark }: { data: AppData; start: (module: ModuleId) => void; openBank: () => void; addMemory: () => void; dark: boolean }) {
@@ -207,7 +203,7 @@ export default function App() {
     <a className="skip-link" href="#main" onClick={(event) => { event.preventDefault(); document.getElementById('main')?.focus() }}>Skip to content</a>
     {fullScreen ? <><div className="flow-notices">{storageNotice}{cloud.user && cloud.state.mode !== 'ready' && cloudStatus}</div>
       {flowModule && <Flow key={flowModule} module={flowModule} data={data} commit={commit} addMemory={addMemory} exit={(history) => go(history ? 'history' : 'home')} registerGuard={registerGuard} />}
-      {view === 'intro' && <BankIntro add={() => addMemory()} home={() => go('home')} />}
+      {view === 'intro' && <BankIntro dark={theme === 'dark'} add={() => addMemory()} home={() => go('home')} />}
       {view === 'remember' && recalled && <Remember memory={recalled} data={data} home={() => go('home')} add={() => addMemory()} />}
       {view === 'capture' && <MemoryCapture key={capture.key} data={data} commit={commit} editingId={capture.id} initialDraft={capture.draft ?? emptyDraft()} home={() => go('home')} bank={() => go('bank')} registerGuard={registerGuard} />}
     </> : <div className="app-layout">

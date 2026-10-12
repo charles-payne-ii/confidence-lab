@@ -1,9 +1,22 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f4f3f6" />
+    <meta name="theme-color" content="#1e1428" />
+    <script>
+      // Apply the saved choice before styles and React load. New visits start dark.
+      try {
+        if (localStorage.getItem('confidence-lab.theme') === 'light') {
+          document.documentElement.dataset.theme = 'light'
+          document.querySelector('meta[name="theme-color"]').content = '#f4f3f6'
+        }
+      } catch { /* Storage unavailable: use the dark default. */ }
+    </script>
+    <style>
+      html { background: #1e1428; }
+      html[data-theme="light"] { background: #f4f3f6; }
+    </style>
     <meta name="description" content="Short, private exercises for mental performance training." />
     <link rel="icon" href="%BASE_URL%favicon.ico?v=zeus" sizes="16x16 32x32 48x48" />
     <link rel="icon" href="%BASE_URL%favicon-16.png" type="image/png" sizes="16x16" />

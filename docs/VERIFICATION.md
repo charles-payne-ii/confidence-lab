@@ -36,6 +36,6 @@ Then run:
 python scripts/check-cloud.py
 ```
 
-Every request to that fixture host is intercepted by Playwright. This checks explicit email sign-in requests containing no entries, first-upload confirmation, autosave, fresh-browser restoration, failed-write retention/retry, concurrent-conflict resolution, and sign-out. Screenshots go to `/tmp/confidence-cloud-checks`. It does **not** test live email delivery, the hosted project's policies, or live authentication.
+Every request to that fixture host is intercepted by Playwright. This checks explicit email sign-in requests containing no entries, first-upload confirmation, autosave, fresh-browser restoration, failed-write retention/retry, concurrent-conflict resolution, sign-out, and opening with unavailable browser storage. Screenshots go to `/tmp/confidence-cloud-checks`. It does **not** test live email delivery, the hosted project's policies, or live authentication.
 
 For final live verification, follow USER_TESTING.md: configure your project, deploy, sign in, save a real entry, wait for cloud confirmation, and restore it in another browser. That check requires your project and account access.

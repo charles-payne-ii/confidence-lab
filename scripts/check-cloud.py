@@ -105,5 +105,17 @@ with sync_playwright() as p:
     nav(page,'Data & privacy');page.get_by_role('button',name='Sign out',exact=True).click()
     expect(page.get_by_role('button',name='Email me a sign-in link')).to_be_visible()
     assert not errors,errors
+    ctx.close()
+    # A storage read failure during SDK import must not prevent the app opening.
+    blocked=context(browser)
+    blocked.add_init_script("Storage.prototype.getItem=function(){throw new Error('blocked')}")
+    page=blocked.new_page();blocked_errors=[]
+    page.on('pageerror',lambda error:blocked_errors.append(str(error)))
+    page.goto(BASE,wait_until='networkidle')
+    expect(page.get_by_role('heading',name='Build Confidence',exact=True)).to_be_visible()
+    expect(page.locator('html')).to_have_attribute('data-theme','dark')
+    expect(page.get_by_text('Saved data could not be read.',exact=False)).to_be_visible()
+    assert not blocked_errors,blocked_errors
+    blocked.close()
     browser.close()
-print('Cloud browser checks passed using simulated auth/service: email-only consent, first upload confirmation, autosave, fresh-browser restoration, failed-write retention/retry, concurrent conflict resolution, sign-out. Live email and hosted service were not tested.')
+print('Cloud browser checks passed using simulated auth/service: email-only consent, first upload confirmation, autosave, fresh-browser restoration, failed-write retention/retry, concurrent conflict resolution, sign-out, unavailable browser storage. Live email and hosted service were not tested.')
