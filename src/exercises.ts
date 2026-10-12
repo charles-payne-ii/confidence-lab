@@ -1,10 +1,11 @@
 import { hasMeaningfulText, localDate, newId, type AppData, type EvidenceType, type ModuleId } from './model'
+import { bankEvidence } from './bank'
 
 export const MODULES = [
   { id: 'confidence', number: 'I', title: 'Build Confidence', description: 'Record effort, success, progress, and the next action.', time: '3 min' },
-  { id: 'prepare', number: 'II', title: 'Prepare to Perform', description: 'Prepare for a specific challenge through evidence review, breathing, focus cues, and mental rehearsal.', time: '1–5 min' },
-  { id: 'pressure', number: 'III', title: 'Manage Pressure', description: 'Use a short breathing and attention-reset routine during moments of pressure.', time: '90 sec' },
-  { id: 'setbacks', number: 'IV', title: 'Learn from Setbacks', description: 'Separate facts from interpretation, identify lessons, and select the next controllable action.', time: '4 min' },
+  { id: 'prepare', number: 'II', title: 'Prepare to Perform', description: 'Rehearse for moments that matter with breathing and visualization.', time: '1–5 min' },
+  { id: 'pressure', number: 'III', title: 'Manage Pressure', description: 'Reset and ground yourself by focusing on action here and now.', time: '90 sec' },
+  { id: 'setbacks', number: 'IV', title: 'Learn from Setbacks', description: 'Separate story from truth for growth and clear decision-making.', time: '4 min' },
 ] as const
 
 export interface ExerciseStep {
@@ -68,7 +69,7 @@ export function addSession(data: AppData, input: SessionInput, date = new Date()
   const answers = Object.fromEntries(Object.entries(input.answers).map(([key, value]) => [key, value.trim()]))
   const expanded = answers.routine === 'expanded'
   const meaningfulKeys = getSteps(input.module, expanded).filter((step) => step.type !== 'choice').map((step) => step.key)
-  const selected = input.module === 'prepare' ? data.confidenceItems.find((item) => item.id === input.confidenceItemId) : undefined
+  const selected = input.module === 'prepare' ? bankEvidence(data).find((item) => item.id === input.confidenceItemId) : undefined
   if (!hasMeaningfulText(...meaningfulKeys.map((key) => answers[key])) && !selected) return null
   const next = structuredClone(data)
   const now = date.toISOString()

@@ -30,7 +30,15 @@ jobs:
       - name: Run tests
         run: npm test
       - name: Build site
-        run: npm run build
+        run: |
+          if [ -n "$CLOUD_PROJECT_URL" ] && [ -n "$CLOUD_PUBLISHABLE_KEY" ]; then
+            export VITE_SUPABASE_URL="$CLOUD_PROJECT_URL"
+            export VITE_SUPABASE_PUBLISHABLE_KEY="$CLOUD_PUBLISHABLE_KEY"
+          fi
+          npm run build
+        env:
+          CLOUD_PROJECT_URL: ${{ vars.VITE_SUPABASE_URL }}
+          CLOUD_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site

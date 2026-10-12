@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Remember, stage 3: Feel</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#f1ebf3}a:hover{color:#c9a862}
+@keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.w1{animation:fadeup 1.4s ease-out both}
+.w2{animation:fadeup 1.4s ease-out 1.2s both}
+.w3{animation:fadeup 1.4s ease-out 2.4s both}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; padding: 24px 30px 36px; background: #1e1428; color: #f1ebf3; font-family: 'EB Garamond', Georgia, serif; display: flex; flex-direction: column; align-items: center; text-align: center">
+  <div style="display: flex; gap: 8px; height: 20px; align-items: center" aria-label="Stage 3 of 4">
+    <span style="width: 18px; height: 2px; background: #c9a862"></span>
+    <span style="width: 18px; height: 2px; background: #c9a862"></span>
+    <span style="width: 18px; height: 2px; background: #c9a862"></span>
+    <span style="width: 18px; height: 2px; background: #574565"></span>
+  </div>
+  <p style="margin: 150px 0 0; font-family: 'Cinzel', Georgia, serif; font-size: 13px; letter-spacing: 0.3em; color: #ad9fbb">YOU FELT</p>
+  <div style="margin-top: 28px; display: flex; flex-direction: column; gap: 6px">
+    <span class="w1" style="font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: 58px; line-height: 1.05; color: #c9a862">Focused</span>
+    <span class="w2" style="font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: 58px; line-height: 1.05; color: #c9a862">Capable</span>
+    <span class="w3" style="font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: 58px; line-height: 1.05; color: #c9a862">Proud</span>
+  </div>
+  <div style="margin-top: 34px; width: 56px; height: 0; border-top: 3px double #574565"></div>
+  <p style="margin: 26px 0 0; font-size: 20px; line-height: 1.5; font-style: italic; color: #d3c9db">Let it come back. That’s still you.</p>
+  <a href="DailyCarry.dc.html" style="margin-top: auto; height: 54px; width: 100%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-family: 'Cinzel', Georgia, serif; font-size: 12px; letter-spacing: 0.24em; color: #ad9fbb">TAP TO CONTINUE</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

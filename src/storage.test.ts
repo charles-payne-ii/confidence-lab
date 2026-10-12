@@ -100,4 +100,16 @@ describe('Performance Lab storage', () => {
   it('uses the stable storage key', () => {
     expect(STORAGE_KEY).toBe('performance-lab:data')
   })
+
+  it('keeps another tab’s newer entries intact instead of overwriting them', () => {
+    const memory = new MemoryStorage()
+    memory.value = JSON.stringify(emptyData())
+    const first = new DataStore(memory), second = new DataStore(memory)
+    first.load(); second.load()
+    expect(second.save(populated()).ok).toBe(true)
+    const latest = memory.value
+    expect(first.save(emptyData()).ok).toBe(false)
+    expect(memory.value).toBe(latest)
+    expect(first.save(emptyData(), true).ok).toBe(true)
+  })
 })
