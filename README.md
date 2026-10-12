@@ -20,6 +20,8 @@ Features include:
 
 The app starts empty. There is no seeded example data. Confidence Bank additions from a practice are selected explicitly. Clear test entries through **Data & privacy → Delete all**, after confirming.
 
+The supplied Zeus mark appears in the sidebar and menu button, with ink colouring in light mode and gold in dark mode. SVG, ICO, and PNG favicons, an Apple touch icon, and 192/512 px home-screen icons are bundled locally. The manifest launches the app at the repository subpath; it does not add offline caching or synchronization.
+
 ## Local development
 
 Requirements: Node.js 20.19+ or 22.12+ and npm.

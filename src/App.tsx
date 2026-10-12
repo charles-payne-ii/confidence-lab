@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Flow from './Flow'
+import ZeusMark from './ZeusMark'
 import { MODULES } from './exercises'
 import { countDistinctPracticeDays, lastLocalDates, type ModuleId } from './model'
 import { ConfidenceBank, DataPrivacy, History, WeeklyReview } from './Records'
@@ -165,12 +166,12 @@ export default function App() {
       {sideOpen && <>
         {!wide && <button tabIndex={-1} className="menu-overlay" aria-label="Close menu" onClick={closeMenu} />}
         <aside ref={sidebarRef} className="sidebar" role={!wide ? 'dialog' : undefined} aria-modal={!wide ? true : undefined} aria-label="Main menu">
-          <div className="sidebar-brand"><button className="brand" aria-label="Confidence Lab home" onClick={() => go('home')}><span className="brand-mark" aria-hidden="true">CL</span><span>Confidence Lab</span></button><button className="collapse-menu" aria-label="Collapse menu" onClick={closeMenu}>‹</button></div>
+          <div className="sidebar-brand"><button className="brand" aria-label="Confidence Lab home" onClick={() => go('home')}><ZeusMark className="brand-mark" /><span>Confidence Lab</span></button><button className="collapse-menu" aria-label="Collapse menu" onClick={closeMenu}>‹</button></div>
           <nav aria-label="Main navigation">{navItems.map(([route, label]) => <button key={route} className={route === view ? 'current' : ''} aria-current={route === view ? 'page' : undefined} onClick={() => go(route)}><span className="nav-dot" aria-hidden="true" />{label}</button>)}</nav>
           <div className="sidebar-bottom"><button className="theme-button" aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`} onClick={toggleTheme}>{theme === 'dark' ? 'Light' : 'Dark'} mode</button>{themeMessage && <p role="status">{themeMessage}</p>}<p>Entries stay in this browser and do not sync between devices.</p></div>
         </aside>
       </>}
-      <button ref={menuButtonRef} className={`open-menu ${sideOpen ? 'menu-hidden' : ''}`} aria-label="Open menu" aria-expanded={sideOpen} onClick={() => setSideOpen(true)}><span /><span /><span /></button>
+      <button ref={menuButtonRef} className={`open-menu ${sideOpen ? 'menu-hidden' : ''}`} aria-label="Open menu" title="Open menu" aria-expanded={sideOpen} onClick={() => setSideOpen(true)}><ZeusMark className="brand-mark" /></button>
       <div className="content-column" inert={sideOpen && !wide ? true : undefined}>
         <main ref={mainRef} tabIndex={-1} id="main" className="page"><div className="global-notices">{storageNotice}</div>
           {view === 'home' ? <Home data={data} start={go} /> : <><button className="back-link" onClick={() => go('home')}>← Home</button><h1 ref={headingRef} tabIndex={-1}>{titles[view][0]}</h1><p className="intro">{titles[view][1]}</p>{view === 'history' && <History data={data} commit={commit} />}{view === 'bank' && <ConfidenceBank data={data} commit={commit} />}{view === 'review' && <WeeklyReview data={data} commit={commit} />}{view === 'data' && <DataPrivacy data={data} replace={replace} corruptRaw={corruptRaw} />}</>}
