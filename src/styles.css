@@ -29,7 +29,8 @@ p{line-height:1.55}
 .sidebar{position:sticky;top:0;height:100dvh;width:272px;flex:none;background:var(--bg);border-right:3px double var(--line2);padding:24px 20px;display:flex;flex-direction:column;gap:24px;overflow-y:auto;z-index:10}
 .sidebar-brand{display:flex;align-items:center;gap:2px;justify-content:space-between;padding-bottom:20px;border-bottom:3px double var(--line2)}
 .brand{display:flex;align-items:center;gap:12px;background:none;border:0;padding:0;text-align:left;min-height:44px;font-family:Cinzel,Georgia,serif;font-size:12px;letter-spacing:.15em;white-space:nowrap}
-.brand-mark{width:40px;height:40px;border-radius:50%;border:1px solid var(--line2);background:repeating-linear-gradient(45deg,var(--line) 0 1px,transparent 1px 7px);display:grid;place-items:center;font-family:Cinzel,serif;font-size:11px;letter-spacing:0;color:var(--ink2);flex:none}
+.brand-mark{display:block;width:40px;height:40px;color:var(--ink);flex:none}
+:root[data-theme=dark] .brand-mark{color:#c9a862}
 .collapse-menu{border:0;background:none;color:var(--muted);font-size:26px;min-height:44px;min-width:28px;padding:0}
 .sidebar nav{display:flex;flex-direction:column}
 .sidebar nav button{width:100%;min-height:48px;display:flex;align-items:center;gap:12px;padding:0 4px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;font-size:18px;color:var(--ink2)}
@@ -40,7 +41,7 @@ p{line-height:1.55}
 .sidebar-bottom p{font-size:15px;color:var(--muted);line-height:1.45;margin:0}
 .theme-button{height:44px;border:1px solid var(--line2);background:none;font-family:Cinzel,Georgia,serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase}
 .open-menu{position:fixed;top:14px;left:14px;z-index:8;width:44px;height:44px;border:1px solid var(--line2);background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
-.open-menu span{width:18px;height:1.5px;background:var(--ink)}
+.open-menu .brand-mark{width:28px;height:28px}
 .menu-hidden{display:none}
 .content-column{flex:1;min-width:0}
 .page{width:100%;max-width:600px;margin:0 auto;padding:76px 24px 64px}
