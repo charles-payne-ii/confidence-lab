@@ -1,17 +1,24 @@
-# Performance Lab
+# Confidence Lab
 
-Performance Lab is a free, private browser app for short mental performance exercises. It helps you notice evidence of competence, prepare for a challenge, and learn from experience without scores, streaks, or pressure.
+Confidence Lab (originally Performance Lab) is a free, private browser app for short mental performance exercises. It helps you notice evidence of competence, prepare for a challenge, and learn from experience without scores, streaks, or pressure.
 
-Version 0.1 includes:
+The updated interface follows the supplied Confidence Lab design: local serif fonts, purple and gold colours, light/dark themes, a collapsible sidebar, and one question at a time.
 
-- Daily practice for effort, success, progress, and a next action
-- An optional, factual setback reflection
+Features include:
+
+- Build Confidence for effort, success, progress, and a next action
+- Manage Pressure with an optional breathing pause, attention reset, and next action
+- Learn from Setbacks with factual reflection, interpretation, an optional other view, and a controllable action
 - Quick and expanded pre-performance routines with an optional breathing timer
 - Event reviews linked to preparations
 - A reusable Confidence Bank and weekly reviews
 - Full history editing and deletion
 - Versioned JSON backup export and validated, confirmed import
 - Seven-day tracking by distinct local calendar day
+- Partial entries with Save, Back, and Skip controls
+- Weekly action checkboxes and persistent theme preferences
+
+The app starts empty. There is no seeded example data. Confidence Bank additions from a practice are selected explicitly. Clear test entries through **Data & privacy → Delete all**, after confirming.
 
 ## Local development
 
@@ -48,25 +55,33 @@ Navigation uses URL hashes, so direct links such as `https://charles-payne-ii.gi
 
 ## Privacy and storage
 
-Entries are stored only in the current browser using `localStorage`. The app has no accounts, synchronization, analytics, AI coaching, notifications, payments, or community features. It makes no application network requests and never transmits entry content.
+Entries are stored only in the current browser using `localStorage`. The app has no accounts, synchronization, analytics, AI coaching, notifications, payments, or community features. It loads only static site files, including bundled fonts, and never transmits entry content.
 
 Data does not sync between devices or browser profiles. Clearing browser or site data can remove it. Private-browsing sessions and browsers with storage disabled may not retain changes. The app reports read and write failures rather than claiming a save succeeded.
 
 ## Backups
 
-Use **History → Backups → Export JSON** regularly and keep the downloaded file somewhere safe. Import validates the complete versioned structure before offering to replace local data. You must confirm replacement. An invalid or unreadable import leaves existing data unchanged.
+Use **Data & privacy → Download .json** regularly and keep the downloaded file somewhere safe. Import validates the complete versioned structure before offering to replace local data. You must confirm replacement. An invalid or unreadable import leaves existing data unchanged.
 
 If the app encounters corrupt saved data, it preserves the original value and blocks accidental replacement. You can download the unreadable value for recovery or explicitly start fresh.
 
-The current data format is version 1. Storage and validation live in `src/storage.ts`; UI components consume the typed model from `src/model.ts`. This boundary is intended to make a future account or synchronization adapter possible without rewriting the exercises.
+The current data format is version 1 and the entry storage key is `performance-lab:data`. Pressure/setback sessions, action checkboxes, and optional routine metadata extend that format; original version 1 backups remain valid. The theme uses `confidence-lab.theme`. Storage and validation live in `src/storage.ts`; exercise definitions and record creation live in `src/exercises.ts`; UI components consume the typed model from `src/model.ts`. This boundary is intended to make a future account or synchronization adapter possible without rewriting the exercises.
+
+Failed writes retain new entries in the current tab and show an explicit warning with a backup action. They do not report a successful persistent save. If saved data cannot be read, the app leaves it untouched until storage is usable again.
 
 ## Limitations
 
 - There is no device-to-device sync, login, encryption layer, or cloud recovery.
 - The app is a personal reflection tool, not clinical care or a substitute for professional support.
 - Dates use the browser’s local calendar and change with the device time zone.
-- Version 0.1 imports only complete version 1 Performance Lab backups.
+- Imports accept complete version 1 Confidence Lab / original Performance Lab backups.
 
 ## Content inspiration
 
 The exercise wording is original. The app is informed by broader performance psychology and by themes explored in Nate Zinsser’s *The Confident Mind*. It does not reproduce book passages, imply endorsement, or promise clinical benefits.
+
+## Fonts and verification
+
+Cinzel, Cormorant Garamond, and EB Garamond are bundled from the supplied design and served locally. Their SIL Open Font License notices are in `public/fonts/`. The app does not load Google Fonts or a CDN runtime.
+
+`npm run check` runs storage and exercise tests followed by the TypeScript and production build checks. Browser checks exercise all four routines, partial saves, explicit bank additions, linked reviews, editing/deletion, weekly action persistence, validated backup replacement and cancellation, failed writes, corrupt saved data, responsive layouts, theme persistence, hash navigation, and refresh at the `/confidence-lab/` subpath.
