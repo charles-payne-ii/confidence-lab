@@ -1,3 +1,5 @@
 Design specs for the Confidence Bank feature are in design/confidence-bank/. Follow CONFIDENCE_BANK_BRIEF.md and match screens/html/ visually.
 
 The owner's subsequent requirement authorizes authenticated Supabase cloud storage for longer user testing. That requirement supersedes the brief's on-device-only rule. Keep local storage, JSON backups, explicit replacement confirmation, and visible save failures. Do not invent or paraphrase stored memories. Public publishable/anon keys are browser configuration; never add service_role keys, passwords, session tokens, or personal entries to source control.
+
+The owner also requested dark mode on opening: use dark as the default and let the introduction follow the saved theme. This supersedes the light-only introduction in the original mockup.

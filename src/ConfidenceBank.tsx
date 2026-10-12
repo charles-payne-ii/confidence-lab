@@ -10,12 +10,12 @@ export function BankBand({ data, open, add, dark }: { data: AppData; open: () =>
   return <section className="bank-band" aria-label="Confidence Bank"><button className="pillar-link" onClick={open} aria-label="Open Confidence Bank"><Pillar count={count} tierHeight={8} onDark={dark} /></button><div><p className="eyebrow">Confidence Bank</p><p className="bank-count">{count} of 10 memories</p><p className="bank-milestone">{milestoneLine(count)}</p>{count < 10 && <button className="text-button bank-add-link" onClick={add}>Add a memory ›</button>}</div></section>
 }
 
-export function BankIntro({ add, home }: { add: () => void; home: () => void }) {
+export function BankIntro({ add, home, dark }: { add: () => void; home: () => void; dark: boolean }) {
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => { heading.current?.focus({ preventScroll: true }) }, [])
-  return <main id="main" tabIndex={-1} className="bank-frame bank-light bank-intro">
+  return <main id="main" tabIndex={-1} className={`bank-frame ${dark ? 'bank-dark' : 'bank-light'} bank-intro`}>
     <ZeusMark className="intro-zeus zeus-glow" /><p className="eyebrow">Confidence Lab</p><h1 ref={heading} tabIndex={-1}>Build your<br />Confidence Bank</h1><p className="bank-intro-copy">Your past holds evidence of what you can do. Start with three specific moments of effort, success, or progress.</p>
-    <div className="intro-pillar"><Pillar count={0} tierHeight={14} /><div><p className="eyebrow">Your bank</p><p className="bank-count">0 of 10 memories</p><p className="bank-milestone">Three set your foundation.</p></div></div>
+    <div className="intro-pillar"><Pillar count={0} tierHeight={14} onDark={dark} /><div><p className="eyebrow">Your bank</p><p className="bank-count">0 of 10 memories</p><p className="bank-milestone">Three set your foundation.</p></div></div>
     <div className="bank-bottom"><button className="bank-primary" onClick={add}>Add my first memory</button><button className="text-button" onClick={home}>Start my day</button></div>
   </main>
 }
