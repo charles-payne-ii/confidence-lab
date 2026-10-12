@@ -1,4 +1,5 @@
 import { hasMeaningfulText, localDate, newId, type AppData, type EvidenceType, type ModuleId } from './model'
+import { bankEvidence } from './bank'
 
 export const MODULES = [
   { id: 'confidence', number: 'I', title: 'Build Confidence', description: 'Record effort, success, progress, and the next action.', time: '3 min' },
@@ -68,7 +69,7 @@ export function addSession(data: AppData, input: SessionInput, date = new Date()
   const answers = Object.fromEntries(Object.entries(input.answers).map(([key, value]) => [key, value.trim()]))
   const expanded = answers.routine === 'expanded'
   const meaningfulKeys = getSteps(input.module, expanded).filter((step) => step.type !== 'choice').map((step) => step.key)
-  const selected = input.module === 'prepare' ? data.confidenceItems.find((item) => item.id === input.confidenceItemId) : undefined
+  const selected = input.module === 'prepare' ? bankEvidence(data).find((item) => item.id === input.confidenceItemId) : undefined
   if (!hasMeaningfulText(...meaningfulKeys.map((key) => answers[key])) && !selected) return null
   const next = structuredClone(data)
   const now = date.toISOString()

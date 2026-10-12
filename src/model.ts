@@ -92,6 +92,25 @@ export interface AppData {
   weeklyReviews: WeeklyReview[]
   reflectionSessions?: ReflectionSession[]
   completedActions?: string[]
+  bank?: BankState
+}
+
+export interface Memory {
+  id: string
+  title: string
+  happened: string
+  evidence: string[]
+  feelings: string[]
+  type?: 'success' | 'effort' | 'progress'
+  createdAt: string
+  updatedAt: string
+}
+
+export interface BankState {
+  memories: Memory[]
+  lastDailyDate?: string
+  rotation: string[]
+  dailyRecallWhenFull?: boolean
 }
 
 export const emptyData = (): AppData => ({

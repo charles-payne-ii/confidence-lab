@@ -106,6 +106,17 @@ const validWeekly = (value: unknown): boolean => {
   )
 }
 
+const meaningfulStrings = (value: unknown): value is string[] => Array.isArray(value) && value.length > 0 && value.every(isNonemptyString)
+
+const validBank = (value: unknown): boolean => {
+  if (!isRecord(value) || !Array.isArray(value.memories) || value.memories.length > 10 || !Array.isArray(value.rotation) || !value.rotation.every(isNonemptyString)) return false
+  if (value.lastDailyDate !== undefined && !isLocalDate(value.lastDailyDate)) return false
+  if (value.dailyRecallWhenFull !== undefined && typeof value.dailyRecallWhenFull !== 'boolean') return false
+  const valid = value.memories.every((memory) => isRecord(memory) && hasBaseFields(memory) && isNonemptyString(memory.title) && isNonemptyString(memory.happened) && memory.happened.length <= 300 && meaningfulStrings(memory.evidence) && meaningfulStrings(memory.feelings) && (memory.type === undefined || (isString(memory.type) && ['success', 'effort', 'progress'].includes(memory.type))))
+  const ids = value.memories.map((memory) => isRecord(memory) ? memory.id : undefined)
+  return valid && new Set(value.rotation).size === value.rotation.length && value.rotation.every((id) => ids.includes(id))
+}
+
 export const validateData = (value: unknown): value is AppData => {
   if (!isRecord(value) || value.version !== DATA_VERSION) return false
   if (
@@ -117,8 +128,9 @@ export const validateData = (value: unknown): value is AppData => {
 
   if (value.reflectionSessions !== undefined && (!Array.isArray(value.reflectionSessions) || !value.reflectionSessions.every(validReflection))) return false
   if (value.completedActions !== undefined && (!Array.isArray(value.completedActions) || !value.completedActions.every(isNonemptyString))) return false
+  if (value.bank !== undefined && !validBank(value.bank)) return false
 
-  const records = [...value.practiceEntries, ...value.confidenceItems, ...value.preparations, ...value.weeklyReviews, ...(Array.isArray(value.reflectionSessions) ? value.reflectionSessions : [])]
+  const records = [...value.practiceEntries, ...value.confidenceItems, ...value.preparations, ...value.weeklyReviews, ...(Array.isArray(value.reflectionSessions) ? value.reflectionSessions : []), ...(isRecord(value.bank) && Array.isArray(value.bank.memories) ? value.bank.memories : [])]
   const ids = records.map((record) => isRecord(record) ? record.id : undefined)
   if (ids.some((id) => !isNonemptyString(id)) || new Set(ids).size !== ids.length) return false
 
@@ -146,6 +158,7 @@ export class DataStore {
   private storage: StorageLike | null
   private corrupt = false
   private readFailed = false
+  private lastRaw: string | null | undefined
 
   constructor(storage?: StorageLike | null) {
     this.storage = storage === undefined ? this.browserStorage() : storage
@@ -165,6 +178,7 @@ export class DataStore {
     }
     try {
       const raw = this.storage.getItem(STORAGE_KEY)
+      this.lastRaw = raw
       if (raw === null) return { status: 'empty', data: emptyData() }
       const parsed = parseImport(raw)
       if (!parsed.ok) {
@@ -186,7 +200,10 @@ export class DataStore {
       return { ok: false, message: 'The unreadable saved data must be downloaded or deliberately replaced before new changes can be stored.' }
     }
     try {
-      this.storage.setItem(STORAGE_KEY, JSON.stringify(data))
+      if (!allowReplaceCorrupt && this.lastRaw !== undefined && this.storage.getItem(STORAGE_KEY) !== this.lastRaw) return { ok: false, message: 'Another tab changed this browser’s saved entries. Your changes are kept in this tab. Export a tab backup, then reload or reconcile your cloud copy.' }
+      const raw = JSON.stringify(data)
+      this.storage.setItem(STORAGE_KEY, raw)
+      this.lastRaw = raw
       this.corrupt = false
       return { ok: true }
     } catch {

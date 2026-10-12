@@ -1,89 +1,89 @@
 # Confidence Lab
 
-Confidence Lab (originally Performance Lab) is a free, private browser app for short mental performance exercises. It helps you notice evidence of competence, prepare for a challenge, and learn from experience without scores, streaks, or pressure.
+A free personal mental performance app built with React, TypeScript, and Vite. Record effort, success, progress, and next actions; prepare for challenges; and learn from experience. There are no scores, streaks, analytics, AI coaching, payments, or notifications.
 
-The updated interface follows the supplied Confidence Lab design: local serif fonts, purple and gold colours, light/dark themes, a collapsible sidebar, and one question at a time.
+## What works
 
-Features include:
+- Daily practice with partial saves, seven local calendar days of activity, and full history editing/deletion.
+- Quick or expanded preparation with optional breathing/rehearsal timers and linked event reviews.
+- Pressure and setback exercises, weekly reflection, and action checkboxes.
+- A Confidence Bank with up to ten specific memories. Four capture steps collect the title, what happened, evidence, and feelings, followed by review before saving.
+- Daily Recall → Pause → Feel → Bank, using your exact words and a shuffled rotation. With no memories, the first open of the day offers Intro; with one to nine, Recall; with ten, Home. Later opens that day go to Home. **Data & privacy** has a setting to keep recall at ten.
+- A shared pillar that fills from the bottom, foundation/strong/complete milestones, light/dark themes, self-hosted italic fonts, and reduced-motion support.
+- Validated JSON export/import and optional private cloud accounts. Local storage works without a configured cloud service.
 
-- Build Confidence for effort, success, progress, and a next action
-- Manage Pressure with an optional breathing pause, attention reset, and next action
-- Learn from Setbacks with factual reflection, interpretation, an optional other view, and a controllable action
-- Quick and expanded pre-performance routines with an optional breathing timer
-- Event reviews linked to preparations
-- A reusable Confidence Bank and weekly reviews
-- Full history editing and deletion
-- Versioned JSON backup export and validated, confirmed import
-- Seven-day tracking by distinct local calendar day
-- Partial entries with Save, Back, and Skip controls
-- Weekly action checkboxes and persistent theme preferences
+The app starts empty. Earlier version 1 bank examples remain under **Data & privacy → Earlier bank examples** and are still selectable before challenges. They are not converted into full memories automatically: the app never invents missing feelings or evidence.
 
-The app starts empty. There is no seeded example data. Confidence Bank additions from a practice are selected explicitly. Clear test entries through **Data & privacy → Delete all**, after confirming.
+## Start user testing
 
-The supplied Zeus mark appears in the sidebar and menu button, with ink colouring in light mode and gold in dark mode. SVG, ICO, and PNG favicons, an Apple touch icon, and 192/512 px home-screen icons are bundled locally. The manifest launches the app at the repository subpath; it does not add offline caching or synchronization.
+Follow [the testing and cloud setup guide](docs/USER_TESTING.md). The site is at:
+
+https://charles-payne-ii.github.io/confidence-lab/
+
+This project's public Supabase configuration is included in `.env.production`. Run the SQL setup and configure authentication redirects before deployment. After deployment, sign in through **Data & privacy**, choose **Start cloud storage**, and wait for **Saved to your cloud account**. Verify restoration in another browser before relying on it for longer testing. Browser storage alone can disappear when site data is cleared.
 
 ## Local development
 
-Requirements: Node.js 20.19+ or 22.12+ and npm.
+Use Node.js 22.12+ and npm:
 
 ```bash
 npm ci
 npm run dev
 ```
 
-Open the local URL printed by Vite. Useful checks:
+For cloud development, copy `.env.example` to `.env.local` and set your project's public URL and publishable (or legacy anon) key. Never put a `service_role` or secret key in the browser configuration. `.env.local` is ignored by Git.
 
 ```bash
-npm test
-npm run build
+npm run check
 npm run preview
 ```
 
-The production build is written to `dist/`. The Vite base path is `/confidence-lab/`, matching this repository’s GitHub Pages project URL.
+`check` runs unit tests, the real SQL migration in embedded PostgreSQL (PGlite), TypeScript, and the production build. PGlite is a development dependency, not shipped to browsers. Browser checks in `scripts/` additionally exercise the app with Python Playwright and Chromium; see [verification notes](docs/VERIFICATION.md).
 
 ## GitHub Pages deployment
 
-The workflow in `.github/workflows/deploy-pages.yml` builds and deploys the app whenever a commit reaches `main`, and it can also be run manually.
+1. Complete the Supabase steps in [USER_TESTING.md](docs/USER_TESTING.md), including running `supabase/setup.sql`.
+2. The public URL/key for this project are already included. To use another project, set both repository **Settings → Secrets and variables → Actions → Variables**: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.
+3. Review and merge the feature pull request into `main`.
+4. Keep **Settings → Pages → Source: GitHub Actions**. Do not configure the suggested Jekyll/HTML templates or select a branch/root folder.
+5. Open **Actions → Deploy Performance Lab to Pages** and wait for a successful run. To rebuild after changing variables, choose **Run workflow → main → Run workflow**.
+6. Open the site URL above and reload.
 
-For the first deployment:
+Vite uses `/confidence-lab/` for asset URLs. Hash navigation works on refresh and direct links such as `#/history`; no server rewrite is needed. The manifest and Zeus icons are bundled locally. There is no service worker/offline cache.
 
-1. Push the completed changes to the repository’s `main` branch.
-2. On GitHub, open **Settings → Pages**.
-3. Under **Build and deployment**, set **Source** to **GitHub Actions**.
-4. Open the **Actions** tab and wait for **Deploy Performance Lab to Pages** to finish. You can run it manually with **Run workflow** if needed.
-5. Open `https://charles-payne-ii.github.io/confidence-lab/`.
+## Privacy and cloud storage
 
-Navigation uses URL hashes, so direct links such as `https://charles-payne-ii.github.io/confidence-lab/#/history` and browser refreshes work without server-side rewrite rules.
+Without sign-in, entries stay in the browser and no entries are sent externally. With sign-in and an explicit connection, the configured Supabase service receives your email for authentication and your entries for storage. No analytics or other third-party requests are used; fonts are self-hosted. The source is public; private entries are not committed to GitHub or hosted by GitHub Pages.
 
-## Privacy and storage
+`supabase/setup.sql` enables row-level security: an authenticated user can read and write only their own `user_data` row. The public browser key is safe to publish because authorization uses the signed-in user's token and database policies. Never expose administrative keys. HTTPS protects transport. This app does not implement end-to-end encryption; the project owner/service can access database data.
 
-Entries are stored only in the current browser using `localStorage`. The app has no accounts, synchronization, analytics, AI coaching, notifications, payments, or community features. It loads only static site files, including bundled fonts, and never transmits entry content.
+`.env.production` contains the project's public URL and publishable key, with the owner's authorization. These are not authentication secrets. GitHub repository variables can override them as a pair; `.env.local` can override them locally. A build with either missing disables cloud configuration rather than crashing.
 
-Data does not sync between devices or browser profiles. Clearing browser or site data can remove it. Private-browsing sessions and browsers with storage disabled may not retain changes. The app reports read and write failures rather than claiming a save succeeded.
+Cloud writes use an atomic expected revision. Offline edits remain in the browser, and a failed save is visible. Reconnection compares the last acknowledged cloud copy, local changes, and remote changes. If both changed, the user must choose a copy; the app does not silently merge or overwrite. Copies can be exported before replacement. Returning online or focusing the app rechecks the service. Imports, edits, and deletions also sync when connected.
 
-## Backups
+Sign-out keeps local entries on the device. Before using a shared device, confirm the cloud save, sign out, then delete local entries. Switching accounts requires an explicit choice if the browser contains different data. An in-flight request is pinned to its original account's token.
 
-Use **Data & privacy → Download .json** regularly and keep the downloaded file somewhere safe. Import validates the complete versioned structure before offering to replace local data. You must confirm replacement. An invalid or unreadable import leaves existing data unchanged.
+Cloud storage survives browser clearing while the account/project remains available, but no system guarantees permanent retention. Maintain the project, review the provider's plan/backup policies, and export JSON regularly to a separate safe location. Free projects may pause after inactivity; restore them in the Supabase dashboard if necessary.
 
-If the app encounters corrupt saved data, it preserves the original value and blocks accidental replacement. You can download the unreadable value for recovery or explicitly start fresh.
+## Backups and data boundaries
 
-The current data format is version 1 and the entry storage key is `performance-lab:data`. Pressure/setback sessions, action checkboxes, and optional routine metadata extend that format; original version 1 backups remain valid. The theme uses `confidence-lab.theme`. Storage and validation live in `src/storage.ts`; exercise definitions and record creation live in `src/exercises.ts`; UI components consume the typed model from `src/model.ts`. This boundary is intended to make a future account or synchronization adapter possible without rewriting the exercises.
+**Data & privacy → Download .json** exports the complete versioned dataset. Import validates every record and bank field before offering replacement; confirmation is required. Invalid or unreadable files leave existing entries unchanged. A valid replacement syncs to a connected account. If browser data is corrupt, the original raw value is preserved, accidental writes are blocked, and a recovery download is offered.
 
-Failed writes retain new entries in the current tab and show an explicit warning with a backup action. They do not report a successful persistent save. If saved data cannot be read, the app leaves it untouched until storage is usable again.
+The version 1 format accepts original Performance Lab/Confidence Lab backups. The Confidence Bank is an optional extension; it includes stable IDs, ISO timestamps, local dates, the rotation queue, and recall settings. No example entries are seeded.
 
-## Limitations
+- `src/model.ts`: typed records.
+- `src/storage.ts`: browser persistence and complete import validation.
+- `src/bank.ts`: memory CRUD, rotation, milestones, and daily rules.
+- `src/cloud.ts`: independent sync/reconciliation engine.
+- `src/supabase.ts`: authenticated backend adapter.
+- `src/useCloud.ts`: React/auth wiring.
 
-- There is no device-to-device sync, login, encryption layer, or cloud recovery.
-- The app is a personal reflection tool, not clinical care or a substitute for professional support.
-- Dates use the browser’s local calendar and change with the device time zone.
-- Imports accept complete version 1 Confidence Lab / original Performance Lab backups.
+Entry storage uses `performance-lab:data`; theme uses `confidence-lab.theme`. `confidence-lab:cloud-journal` stores the last acknowledged account copy to distinguish offline edits from cloud conflicts. Supabase separately stores the sign-in session. JSON backups contain entries/settings, never session tokens.
 
-## Content inspiration
+## Design and content
 
-The exercise wording is original. The app is informed by broader performance psychology and by themes explored in Nate Zinsser’s *The Confident Mind*. It does not reproduce book passages, imply endorsement, or promise clinical benefits.
+The original handoff is in `design/confidence-bank/`: brief, 15 PNG screens, standalone HTML, source mockups, and icon assets. It is a visual reference; its standalone screens do not implement persistence. The user's later cloud-storage requirement supersedes the brief's on-device-only rule. Production code uses React and locally hosted fonts, not the mockup framework or Google Fonts requests.
 
-## Fonts and verification
+Cinzel, Cormorant Garamond, and EB Garamond use their original families, including genuine italic font files. SIL Open Font License notices are in `public/fonts/`.
 
-Cinzel, Cormorant Garamond, and EB Garamond are bundled from the supplied design and served locally. Their SIL Open Font License notices are in `public/fonts/`. The app does not load Google Fonts or a CDN runtime.
-
-`npm run check` runs storage and exercise tests followed by the TypeScript and production build checks. Browser checks exercise all four routines, partial saves, explicit bank additions, linked reviews, editing/deletion, weekly action persistence, validated backup replacement and cancellation, failed writes, corrupt saved data, responsive layouts, theme persistence, hash navigation, and refresh at the `/confidence-lab/` subpath.
+Exercise wording is original, informed by broader performance psychology and themes explored in Nate Zinsser's *The Confident Mind*. No book passages, endorsement, or clinical benefit are implied. Dates follow the device's local calendar/time zone. This is a personal practice tool, not clinical care.

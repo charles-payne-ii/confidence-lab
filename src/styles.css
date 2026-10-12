@@ -41,7 +41,7 @@ p{line-height:1.55}
 .sidebar-bottom p{font-size:15px;color:var(--muted);line-height:1.45;margin:0}
 .theme-button{height:44px;border:1px solid var(--line2);background:none;font-family:Cinzel,Georgia,serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase}
 .open-menu{position:fixed;top:14px;left:14px;z-index:8;width:44px;height:44px;border:1px solid var(--line2);background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
-.open-menu .brand-mark{width:28px;height:28px}
+.open-menu .brand-mark{width:30px;height:30px}
 .menu-hidden{display:none}
 .content-column{flex:1;min-width:0}
 .page{width:100%;max-width:600px;margin:0 auto;padding:76px 24px 64px}
