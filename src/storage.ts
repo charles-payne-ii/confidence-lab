@@ -32,11 +32,15 @@ const isLocalDate = (value: unknown): value is string => {
 const hasBaseFields = (value: Record<string, unknown>): boolean =>
   isNonemptyString(value.id) && isTimestamp(value.createdAt) && isTimestamp(value.updatedAt)
 
+const validMeta = (value: Record<string, unknown>): boolean =>
+  (value.complete === undefined || typeof value.complete === 'boolean') &&
+  (value.durationSeconds === undefined || (typeof value.durationSeconds === 'number' && Number.isFinite(value.durationSeconds) && value.durationSeconds >= 0))
+
 const validSetback = (value: unknown): boolean =>
   isRecord(value) && isString(value.facts) && isString(value.meaning) && isString(value.control)
 
 const validPractice = (value: unknown): boolean => {
-  if (!isRecord(value) || !hasBaseFields(value)) return false
+  if (!isRecord(value) || !hasBaseFields(value) || !validMeta(value)) return false
   return (
     isLocalDate(value.localDate) &&
     isString(value.effort) &&
@@ -52,20 +56,21 @@ const validConfidence = (value: unknown): boolean => {
   return (
     isString(value.title) &&
     isString(value.detail) &&
+    (value.type === undefined || (isString(value.type) && ['Effort', 'Success', 'Progress', 'Preparation'].includes(value.type))) &&
     (value.sourcePracticeId === undefined || isString(value.sourcePracticeId))
   )
 }
 
 const validReview = (value: unknown): boolean =>
   isRecord(value) &&
-    isTimestamp(value.createdAt) &&
-    isTimestamp(value.updatedAt) &&
+  isTimestamp(value.createdAt) &&
+  isTimestamp(value.updatedAt) &&
   isString(value.worked) &&
   isString(value.change) &&
   isString(value.practiseNext)
 
 const validPreparation = (value: unknown): boolean => {
-  if (!isRecord(value) || !hasBaseFields(value)) return false
+  if (!isRecord(value) || !hasBaseFields(value) || !validMeta(value)) return false
   return (
     isLocalDate(value.localDate) &&
     isString(value.challenge) &&
@@ -78,9 +83,18 @@ const validPreparation = (value: unknown): boolean => {
     isString(value.rehearsalActions) &&
     isString(value.likelyDifficulty) &&
     isString(value.plannedResponse) &&
+    (value.evidence === undefined || isString(value.evidence)) &&
+    (value.breathing === undefined || isString(value.breathing)) &&
+    (value.rehearsal === undefined || isString(value.rehearsal)) &&
     (value.review === undefined || validReview(value.review))
   )
 }
+
+const validReflection = (value: unknown): boolean =>
+  isRecord(value) && hasBaseFields(value) && validMeta(value) && isLocalDate(value.localDate) &&
+  (value.module === 'pressure' || value.module === 'setbacks') &&
+  isRecord(value.answers) && Object.entries(value.answers).every(([key, answer]) =>
+    ['breath', 'see', 'next', 'facts', 'story', 'alt', 'lesson'].includes(key) && isString(answer))
 
 const validWeekly = (value: unknown): boolean => {
   if (!isRecord(value) || !hasBaseFields(value)) return false
@@ -101,7 +115,10 @@ export const validateData = (value: unknown): value is AppData => {
     !Array.isArray(value.weeklyReviews)
   ) return false
 
-  const records = [...value.practiceEntries, ...value.confidenceItems, ...value.preparations, ...value.weeklyReviews]
+  if (value.reflectionSessions !== undefined && (!Array.isArray(value.reflectionSessions) || !value.reflectionSessions.every(validReflection))) return false
+  if (value.completedActions !== undefined && (!Array.isArray(value.completedActions) || !value.completedActions.every(isNonemptyString))) return false
+
+  const records = [...value.practiceEntries, ...value.confidenceItems, ...value.preparations, ...value.weeklyReviews, ...(Array.isArray(value.reflectionSessions) ? value.reflectionSessions : [])]
   const ids = records.map((record) => isRecord(record) ? record.id : undefined)
   if (ids.some((id) => !isNonemptyString(id)) || new Set(ids).size !== ids.length) return false
 
@@ -117,7 +134,7 @@ export const parseImport = (text: string): { ok: true; data: AppData } | { ok: f
   try {
     const parsed: unknown = JSON.parse(text)
     if (!validateData(parsed)) {
-      return { ok: false, message: 'This file is not a complete Performance Lab version 1 backup.' }
+      return { ok: false, message: 'This file is not a complete Confidence Lab version 1 backup.' }
     }
     return { ok: true, data: parsed }
   } catch {
@@ -128,6 +145,7 @@ export const parseImport = (text: string): { ok: true; data: AppData } | { ok: f
 export class DataStore {
   private storage: StorageLike | null
   private corrupt = false
+  private readFailed = false
 
   constructor(storage?: StorageLike | null) {
     this.storage = storage === undefined ? this.browserStorage() : storage
@@ -155,12 +173,15 @@ export class DataStore {
       }
       return { status: 'ok', data: parsed.data }
     } catch {
+      this.readFailed = true
       return { status: 'unavailable', data: emptyData(), message: 'Saved data could not be read. Changes will last only for this tab.' }
     }
   }
 
   save(data: AppData, allowReplaceCorrupt = false): SaveResult {
+    if (!validateData(data)) return { ok: false, message: 'This change has invalid data and was not stored.' }
     if (!this.storage) return { ok: false, message: 'Browser storage is unavailable. Export a backup before closing this tab.' }
+    if (this.readFailed) return { ok: false, message: 'Existing storage could not be read and has been left untouched. Export your tab data and try again after reloading.' }
     if (this.corrupt && !allowReplaceCorrupt) {
       return { ok: false, message: 'The unreadable saved data must be downloaded or deliberately replaced before new changes can be stored.' }
     }
